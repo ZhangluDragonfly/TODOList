@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+</head>
+<body>
+  <div id="app">
+    <h2>TODO List</h2>
+
+    <el-input v-model="input" placeholder="请输入内容"></el-input>
+    <el-button @click="onAddClick">添加</el-button>
+    
+    <el-dialog v-model="visible" title="已完成">
+      <p>{{input}}</p>
+    </el-dialog>
+
+    <template>
+      <el-table
+        :data="tableData"
+        stripe
+        style="width: 100%">
+        <el-table-column
+          prop="time"
+          label="时间"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="task"
+          label="任务">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          label="操作"
+          width="150">
+          <template scope="key">
+            <el-button @click="onDoneClick(key)" type="text" size="small">完成</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </template>
+  </div>
+  
+</body>
+  <!-- 先引入 Vue -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: function() {
+        return { 
+          count: 3,
+          visible: false ,
+          input: '',
+           tableData: [{
+              time: '2016-5-2 15:34:29',
+              task: '慢跑十公里',
+              key: 0
+            }, {
+              time: '2016-5-1  15:34:29',
+              task: '看书，《JavaScript权威指南》',
+              key: 1
+            }, {
+              time: '2016-5-4  15:34:29',
+              task: '学习vue，并实现小demo',
+              key: 2
+            }]
+        }
+      },
+
+      methods: {
+
+        onAddClick() {
+          var date = (new Date()).getFullYear()+ '-' + (new Date()).getMonth()+ '-' + (new Date()).getDay();
+          var time = date + ' ' + (new Date()).toTimeString().slice(0,8);
+
+          this.tableData.unshift({
+            time: time,
+            task: this.input,
+            key: this.count++
+          });
+          this.input = "";
+        },
+
+        onDoneClick(arg) {
+          console.log(arg.row.key);
+          this.$confirm('此操作将删除该任务, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+
+            var i ;
+            this.tableData.forEach(function(ele, index){
+              if(ele.key === arg.row.key)
+                i = index;
+            });
+            this.tableData.splice(i,1);
+
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          });
+        }
+      }
+    });
+   
+
+  </script>
+</html>
